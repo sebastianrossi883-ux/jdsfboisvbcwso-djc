@@ -50,6 +50,7 @@ class StitchSender:
         self.cfg = cfg
         self.url = cfg.get("stitch.url", "https://stitch.withgoogle.com/")
         self.model = cfg.get("stitch.model", "3.1 Pro")
+        self.version = str(cfg.get("stitch.version", "web")).lower()  # "web" oppure "app"
         self.headless = bool(cfg.get("stitch.headless", True))
         self.channel = cfg.get("stitch.browser_channel", None)  # es. "chrome"; None = Chromium
         self.user_data_dir = cfg.get("stitch.user_data_dir", "./.stitch_profile")
@@ -169,6 +170,21 @@ class StitchSender:
             self.save_debug("no_composer")
             raise RuntimeError("Composer non trovato: login non riuscito o UI cambiata.")
         log.info("Composer pronto.")
+
+    # ---- versione Web / App (si sceglie una volta) ------------------------
+
+    def select_version(self, version: Optional[str] = None) -> None:
+        """Sceglie la versione del progetto: "web" (default) oppure "app".
+
+        A differenza del modello, la versione si imposta UNA volta (è una scelta
+        del progetto, non cambia ad ogni prompt).
+        """
+        version = (version or self.version).lower()
+        key = "version_web_toggle" if version == "web" else "version_app_toggle"
+        if self._click(key, timeout=6000, required=False):
+            log.info("Versione selezionata: %s", version)
+        else:
+            log.info("Toggle versione '%s' non trovato (forse gia' impostata o UI diversa).", version)
 
     # ---- gate sul modello 3.1 Pro -----------------------------------------
 
@@ -303,6 +319,7 @@ class StitchSender:
         """Esegue le fasi in sequenza. `steps` = lista di PromptStep (text, images)."""
         self.open()
         self.wait_for_login()
+        self.select_version()   # sceglie "web" (non "app") una volta
 
         for index, step in enumerate(steps):
             phase = index + 1

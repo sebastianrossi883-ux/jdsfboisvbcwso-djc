@@ -25,6 +25,7 @@ source:
 stitch:
   url: "https://stitch.withgoogle.com/"
   model: "3.1 Pro"          # modello da tenere SEMPRE (gate anti-downgrade a "3 Flash")
+  version: "web"            # "web" (non "app") - si sceglie una volta a inizio progetto
   headless: true            # true sul server/Colab; false in locale per vedere il browser
   browser_channel: null     # null = Chromium (Linux/Colab); "chrome" = Chrome vero (Mac locale)
   user_data_dir: "./.stitch_profile"   # sessione di login Google/Stitch salvata qui
@@ -43,6 +44,13 @@ stitch:
   # Ogni voce può essere una stringa O una lista di candidati: il sender prova
   # il primo che esiste (in pagina o dentro l'iframe di Stitch).
   selectors:
+    version_web_toggle:             # scheda/pulsante "Web" (NON "App")
+      - "button:has-text('Web')"
+      - "[role='tab']:has-text('Web')"
+      - "text=Web"
+    version_app_toggle:             # scheda/pulsante "App" (per riferimento)
+      - "button:has-text('App')"
+      - "[role='tab']:has-text('App')"
     prompt_input:
       - "textarea"
       - "[contenteditable='true']"
