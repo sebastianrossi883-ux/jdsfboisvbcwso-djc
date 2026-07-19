@@ -31,6 +31,10 @@ def _read_text(path: Path) -> str:
 
 def build_steps(job: Job, cfg: Config) -> list[PromptStep]:
     """Trasforma un Job in una sequenza di PromptStep pronti per l'invio."""
+    # Modalità roulette: i 5 prompt li genera la roulette (fase 3/4 assemblate).
+    if cfg.get("roulette.enabled"):
+        return _build_roulette_steps(job, cfg)
+
     if not job.prompts:
         return []
 
@@ -44,6 +48,32 @@ def build_steps(job: Job, cfg: Config) -> list[PromptStep]:
     if cfg.get("prompt.mode") == "claude":
         steps = _enhance_with_claude(steps, cfg)
 
+    return steps
+
+
+def _build_roulette_steps(job: Job, cfg: Config) -> list[PromptStep]:
+    """Genera i 5 step pescando dall'arsenal (roulette) e assemblando i prompt.
+
+    La fase 1 porta le reference del job (le fette dello splitter); le fasi 2/5
+    sono i prompt fissi; le fasi 3/4 sono componente/framer scelti dalla roulette,
+    col codice sorgente impacchettato dentro.
+    """
+    from .assemble import build_prompts
+    from .roulette import config_from, spin
+
+    result = spin(config_from(cfg))
+    texts = build_prompts(
+        result,
+        arsenal_base=cfg.get("roulette.arsenal_base", "./arsenal"),
+        prompts_dir=cfg.get("prompts_dir", "prompts"),
+    )
+
+    steps: list[PromptStep] = []
+    for index, text in enumerate(texts):
+        images = job.references if index == 0 else []
+        steps.append(PromptStep(text=text, images=list(images)))
+    log.info("Roulette: 5 prompt generati (component=%s, framer=%s).",
+             result.component, result.framers[0] if result.framers else None)
     return steps
 
 
