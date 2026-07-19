@@ -1,0 +1,14 @@
+# Automazione del browser (consegna su sito Stitch)
+playwright==1.49.0
+
+# Configurazione
+PyYAML==6.0.2
+python-dotenv==1.0.1
+
+# Sorgente Google Drive (opzionale, serve solo se source.type = gdrive)
+google-api-python-client==2.151.0
+google-auth==2.35.0
+google-auth-httplib2==0.2.0
+
+# Generazione/adattamento prompt con Claude (opzionale, serve solo se prompt.mode = claude)
+anthropic==0.42.0

@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Configurazione locale e segreti
+.env
+config.yaml
+gdrive-service-account.json
+
+# Sessione di login a Stitch (browser profile)
+.stitch_profile/
+
+# Materiale scaricato e risultati (di default non versionati)
+/material/*
+!/material/esempio_job/
+/results/*
+!/results/.gitkeep
+
+# Log
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db

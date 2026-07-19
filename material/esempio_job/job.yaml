@@ -1,0 +1,25 @@
+# Descrittore del job (opzionale ma consigliato).
+# Se rimuovi questo file, il programma deduce automaticamente reference e prompt
+# dal contenuto della cartella (immagini = reference, .md in ordine = prompt).
+
+name: esempio_cantina_artisan_heritage
+
+# Override opzionali (se assenti, valgono i valori globali di config.yaml)
+model: "3.1 pro"
+version: web
+
+# Le immagini reference: vengono allegate INSIEME AL PRIMO PROMPT.
+references:
+  - refs/mauro_sebaste_01.png
+  - refs/mauro_sebaste_02.png
+  - refs/ca_san_sebastiano_01.png
+
+# I prompt, nell'ORDINE esatto in cui verranno inviati a Stitch.
+# 1° = base (design system) con le reference; poi in sequenza gli altri.
+prompts:
+  - 01_design_system.md
+  - 02_inventario_reference.md
+  - 03_motion_manifest.md
+  - 04_guest_component.md
+  - 05_framer_interactive.md
+  - 06_gsap_bundle.md

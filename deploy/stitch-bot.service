@@ -1,0 +1,27 @@
+# Servizio systemd per far girare il bot 24/7 su Oracle Cloud (o qualsiasi VM Linux).
+#
+# Installazione:
+#   1) copia questo file in /etc/systemd/system/stitch-bot.service
+#      (adatta User e i percorsi WorkingDirectory/ExecStart al tuo caso)
+#   2) sudo systemctl daemon-reload
+#   3) sudo systemctl enable --now stitch-bot
+#   4) log in tempo reale:  journalctl -u stitch-bot -f
+
+[Unit]
+Description=Stitch Reference Mirroring System (bot 24/7)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu/stitch-bot
+# Usa la virtualenv creata durante il setup (vedi oracle-setup.md)
+ExecStart=/home/ubuntu/stitch-bot/.venv/bin/python -m src.main
+Restart=always
+RestartSec=10
+# Riavvia anche se il processo esce con successo (loop continuo)
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target

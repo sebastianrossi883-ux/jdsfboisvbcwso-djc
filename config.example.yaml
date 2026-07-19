@@ -1,0 +1,75 @@
+# =============================================================================
+#  CONFIGURAZIONE — copia questo file in "config.yaml" e modifica i valori.
+#  (config.yaml NON viene versionato: contiene le tue impostazioni personali)
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# 1) DA DOVE ARRIVA IL MATERIALE (i "job")
+# -----------------------------------------------------------------------------
+source:
+  type: local            # "local" = cartella sul disco  |  "gdrive" = Google Drive
+
+  local:
+    path: ./material     # ogni sottocartella qui dentro è un job
+
+  gdrive:
+    folder_id: ""                                   # ID della cartella "madre" su Drive
+    credentials_file: ./gdrive-service-account.json # credenziali service account
+    download_dir: ./material                        # dove scarica i job da Drive
+
+# -----------------------------------------------------------------------------
+# 2) AUTOMAZIONE DEL SITO STITCH
+#    NB: i "selettori" qui sotto sono la mappa dei punti su cui cliccare/scrivere
+#        nella pagina di Stitch. Vanno calibrati sull'interfaccia reale (vedi README).
+# -----------------------------------------------------------------------------
+stitch:
+  url: "https://stitch.withgoogle.com/"
+  model: "3.1 pro"       # modello da selezionare in Stitch
+  version: "web"         # "web" oppure "app"
+  headless: true         # true sul server Oracle; metti false in locale per vedere il browser
+  user_data_dir: "./.stitch_profile"   # qui viene salvata la sessione di login (Google/Stitch)
+  slow_mo_ms: 50         # rallenta le azioni (utile in debug)
+
+  timeouts:
+    navigation_ms: 60000       # attesa caricamento pagina
+    generation_ms: 900000      # attesa MAX per la generazione di Stitch (qui 15 min)
+
+  # ---- SELETTORI (da adattare all'interfaccia reale di Stitch) ----
+  selectors:
+    new_project_button: "text=New project"
+    model_menu_button:  "[data-testid='model-selector']"
+    model_option:       "text={model}"       # {model} viene sostituito con stitch.model
+    version_web_toggle:  "text=Web"
+    version_app_toggle:  "text=App"
+    prompt_input:       "textarea"
+    image_upload_input: "input[type='file']"
+    submit_button:      "[data-testid='send-button']"
+    generation_done:    "[data-testid='generation-complete']"  # elemento che compare a fine generazione
+    copy_code_button:   "text=Copy code"
+    result_link:        "[data-testid='project-link']"
+
+# -----------------------------------------------------------------------------
+# 3) COME COSTRUIRE IL PROMPT
+# -----------------------------------------------------------------------------
+prompt:
+  mode: "passthrough"    # "passthrough" = invia i .md così come sono (consigliato)
+                         # "claude"      = fa rielaborare/adattare i .md a Claude prima di inviare
+  claude:
+    model: "claude-opus-4-8"
+    max_tokens: 4000
+    system: "Sei un assistente che adatta prompt per Stitch. Mantieni intatte le istruzioni tecniche."
+    # La chiave API si mette in .env come ANTHROPIC_API_KEY (non qui)
+
+# -----------------------------------------------------------------------------
+# 4) COSA SALVARE COME RISULTATO
+# -----------------------------------------------------------------------------
+result:
+  type: "code"           # "code" = salva il codice esportato | "screenshot" | "link" | "none"
+  output_dir: ./results  # i risultati finiscono in results/<nome_job>/
+
+# -----------------------------------------------------------------------------
+# 5) LOOP 24/7
+# -----------------------------------------------------------------------------
+loop:
+  poll_interval_sec: 60  # ogni quanti secondi cerca nuovi job
+  once: false            # true = processa i job in coda una volta sola e poi esce (utile per test)
