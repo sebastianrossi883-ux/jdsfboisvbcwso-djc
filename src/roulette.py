@@ -148,15 +148,40 @@ def _is_react_component(folder: Path) -> bool:
     return False
 
 
+def _base_key(name: str) -> str:
+    """Chiave per raggruppare le varianti dello stesso componente.
+
+    Es. 'RevealSlideshow', 'RevealSlideshow-master', 'RevealSlideshowReact'
+    e 'GOLDEN_..._STICKY_GRID 2' -> stessa base.
+    """
+    n = name.lower()
+    n = re.sub(r"(react|_backup|_final|-main|-master|-final| \d+)", "", n)
+    n = re.sub(r"[^a-z0-9]", "", n)
+    return n or name.lower()
+
+
 def _eligible_components(componenti: Path, prefer_react: bool) -> list[str]:
-    names = _get_dirs(componenti)
-    # escludi webgl/three/shader
-    names = [n for n in names if not any(x in n.lower() for x in COMPONENT_EXCLUDE)]
-    if prefer_react:
-        react = [n for n in names if _is_react_component(componenti / n)]
-        if react:
-            return react
-    return names
+    """Un rappresentante per ogni componente UNICO (usa tutto).
+
+    Le varianti (vanilla / -master / React) contano come un solo componente;
+    se `prefer_react`, si sceglie la forma React quando esiste, altrimenti la
+    vanilla. Così NON si perde nessun componente, ma si preferisce il React.
+    """
+    names = [n for n in _get_dirs(componenti)
+             if not any(x in n.lower() for x in COMPONENT_EXCLUDE)]
+    groups: dict[str, list[str]] = {}
+    for n in names:
+        groups.setdefault(_base_key(n), []).append(n)
+
+    pool: list[str] = []
+    for variants in groups.values():
+        variants = sorted(variants)
+        if prefer_react:
+            react = [v for v in variants if _is_react_component(componenti / v)]
+            pool.append(react[0] if react else variants[0])
+        else:
+            pool.append(variants[0])
+    return sorted(pool)
 
 
 # ---- API principale --------------------------------------------------------
