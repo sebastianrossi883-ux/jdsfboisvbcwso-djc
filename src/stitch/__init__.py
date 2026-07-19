@@ -1,5 +1,5 @@
 """Automazione del sito Stitch tramite browser (Playwright)."""
 
-from .browser import StitchBrowser
+from .sender import ModelDowngradeError, StitchSender
 
-__all__ = ["StitchBrowser"]
+__all__ = ["StitchSender", "ModelDowngradeError"]

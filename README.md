@@ -137,7 +137,7 @@ src/
     local.py            job da cartella locale
     gdrive.py           job da Google Drive
   stitch/
-    browser.py          automazione del sito Stitch (Playwright)
+    sender.py           automazione del sito Stitch (Playwright): 5 fasi, gate 3.1 Pro, download ZIP
     login.py            login una-tantum (salva la sessione)
 config.example.yaml     configurazione di esempio
 material/esempio_job/   un job completo di esempio

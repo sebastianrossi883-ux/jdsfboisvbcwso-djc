@@ -24,29 +24,51 @@ source:
 # -----------------------------------------------------------------------------
 stitch:
   url: "https://stitch.withgoogle.com/"
-  model: "3.1 pro"       # modello da selezionare in Stitch
-  version: "web"         # "web" oppure "app"
-  headless: true         # true sul server Oracle; metti false in locale per vedere il browser
-  user_data_dir: "./.stitch_profile"   # qui viene salvata la sessione di login (Google/Stitch)
-  slow_mo_ms: 50         # rallenta le azioni (utile in debug)
+  model: "3.1 Pro"          # modello da tenere SEMPRE (gate anti-downgrade a "3 Flash")
+  headless: true            # true sul server/Colab; false in locale per vedere il browser
+  browser_channel: null     # null = Chromium (Linux/Colab); "chrome" = Chrome vero (Mac locale)
+  user_data_dir: "./.stitch_profile"   # sessione di login Google/Stitch salvata qui
+  slow_mo_ms: 50            # rallenta le azioni (utile in debug)
+
+  phase_wait_seconds: 180        # attesa tra una fase (prompt) e la successiva
+  download_timeout_seconds: 1800 # attesa MAX per il download dello ZIP finale
+  model_gate_retries: 3          # quante volte riprovare a forzare 3.1 Pro prima di STOP
+  debug_dir: "./debug"           # screenshot + DOM dei frame quando qualcosa non va
 
   timeouts:
     navigation_ms: 60000       # attesa caricamento pagina
     generation_ms: 900000      # attesa MAX per la generazione di Stitch (qui 15 min)
 
-  # ---- SELETTORI (da adattare all'interfaccia reale di Stitch) ----
+  # ---- SELETTORI (da CALIBRARE sull'interfaccia reale di Stitch) ----
+  # Ogni voce può essere una stringa O una lista di candidati: il sender prova
+  # il primo che esiste (in pagina o dentro l'iframe di Stitch).
   selectors:
-    new_project_button: "text=New project"
-    model_menu_button:  "[data-testid='model-selector']"
-    model_option:       "text={model}"       # {model} viene sostituito con stitch.model
-    version_web_toggle:  "text=Web"
-    version_app_toggle:  "text=App"
-    prompt_input:       "textarea"
-    image_upload_input: "input[type='file']"
-    submit_button:      "[data-testid='send-button']"
-    generation_done:    "[data-testid='generation-complete']"  # elemento che compare a fine generazione
-    copy_code_button:   "text=Copy code"
-    result_link:        "[data-testid='project-link']"
+    prompt_input:
+      - "textarea"
+      - "[contenteditable='true']"
+      - "[role='textbox']"
+    image_upload_input:
+      - "input[type='file']"
+    submit_button:
+      - "button[type='submit']"
+      - "button[aria-label*='Send' i]"
+      - "button:has-text('Send')"
+    model_menu_button:              # apre il menu di scelta modello
+      - "button:has-text('Pro')"
+      - "button:has-text('Flash')"
+      - "[data-testid='model-selector']"
+    model_option:                   # la voce "3.1 Pro" nel menu
+      - "text=3.1 Pro"
+      - "[role='option']:has-text('3.1 Pro')"
+    model_current_label:            # etichetta del modello attivo (per il gate)
+      - "[data-testid='model-selector']"
+      - "button:has-text('Pro')"
+    generation_done:                # elemento che compare a fine generazione
+      - "text=Download"
+      - "[data-testid='generation-complete']"
+    download_button:                # scarica lo ZIP del risultato
+      - "button:has-text('Download')"
+      - "button[aria-label*='Download' i]"
 
 # -----------------------------------------------------------------------------
 # 3) COME COSTRUIRE IL PROMPT

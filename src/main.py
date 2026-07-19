@@ -22,7 +22,7 @@ from .config import load_config
 from .prompt_builder import build_steps
 from .results import result_dir_for
 from .sources import build_source
-from .stitch import StitchBrowser
+from .stitch import StitchSender
 
 log = logging.getLogger("stitch_bot")
 
@@ -41,7 +41,6 @@ def process_pending(cfg, source) -> int:
     if not jobs:
         return 0
 
-    result_type = cfg.get("result.type", "code")
     done = 0
 
     for job in jobs:
@@ -51,14 +50,8 @@ def process_pending(cfg, source) -> int:
             steps = build_steps(job, cfg)
             dest = result_dir_for(job.name, cfg)
 
-            with StitchBrowser(cfg) as browser:
-                out = browser.run_job(
-                    steps=steps,
-                    result_type=result_type,
-                    dest_dir=dest,
-                    model=job.model,
-                    version=job.version,
-                )
+            with StitchSender(cfg) as sender:
+                out = sender.run_job(steps=steps, dest_dir=dest)
 
             source.mark_done(job)
             done += 1
