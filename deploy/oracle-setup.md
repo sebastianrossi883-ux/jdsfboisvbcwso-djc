@@ -23,6 +23,14 @@ sudo apt install -y libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 \
   libasound2 libpango-1.0-0 libcairo2 libatspi2.0-0
 ```
 
+## 1-bis) Installazione rapida (uno script)
+
+In alternativa ai passi manuali, dopo aver clonato il progetto puoi lanciare:
+```bash
+bash deploy/install.sh
+```
+Fa tutto: dipendenze, virtualenv, librerie, Chromium, `config.yaml` e `.env`.
+
 ## 2) Scarica il progetto
 
 ```bash
@@ -34,6 +42,28 @@ source .venv/bin/activate
 pip install -r requirements.txt
 python -m playwright install chromium
 ```
+
+## 2-bis) ARSENAL — portalo sulla VM (rclone da Google Drive)
+
+Su Colab l'arsenal si "montava" da Drive; su una VM va **copiato una volta**.
+Il modo più semplice è **rclone**:
+
+```bash
+sudo apt install -y rclone
+rclone config          # crea un remote chiamato "gdrive" (tipo: drive), autorizza col browser
+# scarica SOLO l'arsenal (non tutto il Drive) nella cartella locale ./arsenal
+rclone copy "gdrive:percorso/della/cartella senza nome 6" ~/stitch-bot/arsenal --progress
+```
+
+Poi in `config.yaml`:
+```yaml
+roulette:
+  enabled: true
+  arsenal_base: "/home/ubuntu/stitch-bot/arsenal"
+```
+
+> L'arsenal è grande (diversi GB): assicurati di avere spazio disco sulla VM.
+> Quando aggiungi materiale su Drive, rilancia lo stesso `rclone copy` per aggiornarlo.
 
 ## 3) Configura
 
