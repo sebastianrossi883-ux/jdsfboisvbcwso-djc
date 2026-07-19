@@ -86,7 +86,14 @@ class StitchSender:
             headless=self.headless,
             slow_mo=self.slow_mo,
             accept_downloads=True,
-            args=["--no-sandbox", "--disable-dev-shm-usage"],
+            # Nasconde i segnali di automazione: Google altrimenti blocca il login
+            # ("browser non sicuro").
+            args=[
+                "--no-sandbox",
+                "--disable-dev-shm-usage",
+                "--disable-blink-features=AutomationControlled",
+            ],
+            ignore_default_args=["--enable-automation"],
         )
         if self.channel:  # usa Chrome vero se richiesto e disponibile
             launch_kwargs["channel"] = self.channel
@@ -95,6 +102,14 @@ class StitchSender:
         except Exception:
             launch_kwargs.pop("channel", None)  # fallback a Chromium
             self._context = self._playwright.chromium.launch_persistent_context(**launch_kwargs)
+
+        # ulteriore mascheramento: nasconde navigator.webdriver
+        try:
+            self._context.add_init_script(
+                "Object.defineProperty(navigator, 'webdriver', {get: () => undefined});"
+            )
+        except Exception:  # noqa: BLE001
+            pass
 
         self._context.set_default_timeout(self.nav_timeout)
         self._page = self._context.pages[0] if self._context.pages else self._context.new_page()

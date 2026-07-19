@@ -74,11 +74,14 @@ def main() -> None:
     except FileNotFoundError:
         cfg = load_config("config.example.yaml")
 
-    # forza il browser VISIBILE per la calibrazione
+    # forza il browser VISIBILE + Chrome vero (il login Google funziona meglio)
     if isinstance(cfg, Config):
-        cfg.data.setdefault("stitch", {})["headless"] = False
+        st = cfg.data.setdefault("stitch", {})
+        st["headless"] = False
+        if not st.get("browser_channel"):
+            st["browser_channel"] = "chrome"
 
-    print("Apro Stitch in un browser visibile...")
+    print("Apro Stitch con Chrome (browser visibile)...")
     with StitchSender(cfg) as sender:
         sender.open()
         input(
