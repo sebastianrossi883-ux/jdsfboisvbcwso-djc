@@ -1,17 +1,21 @@
+# Versioni con vincolo minimo (>=) invece che fisso: così pip prende
+# automaticamente il pacchetto giusto per la tua versione di Python
+# (incluso Python 3.13 / 3.14, che vogliono i pacchetti più recenti).
+
 # Automazione del browser (consegna su sito Stitch)
-playwright==1.49.0
+playwright>=1.55.0
 
 # Splitter delle reference (taglio immagini in fette)
-Pillow==11.0.0
+Pillow>=11.0.0
 
 # Configurazione
-PyYAML==6.0.2
-python-dotenv==1.0.1
+PyYAML>=6.0.2
+python-dotenv>=1.0.1
 
 # Sorgente Google Drive (opzionale, serve solo se source.type = gdrive)
-google-api-python-client==2.151.0
-google-auth==2.35.0
-google-auth-httplib2==0.2.0
+google-api-python-client>=2.151.0
+google-auth>=2.35.0
+google-auth-httplib2>=0.2.0
 
 # Generazione/adattamento prompt con Claude (opzionale, serve solo se prompt.mode = claude)
-anthropic==0.42.0
+anthropic>=0.42.0
