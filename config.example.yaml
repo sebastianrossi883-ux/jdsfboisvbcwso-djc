@@ -103,3 +103,21 @@ result:
 loop:
   poll_interval_sec: 60  # ogni quanti secondi cerca nuovi job
   once: false            # true = processa i job in coda una volta sola e poi esce (utile per test)
+
+# -----------------------------------------------------------------------------
+# 6) ROULETTE (opzionale) — pesca ingredienti diversi dall'arsenal ad ogni giro
+#    Memoria anti-ripetizione: passa per TUTTO l'arsenal prima di ripetere.
+# -----------------------------------------------------------------------------
+roulette:
+  enabled: false                 # true = rigenera fasi 2/3/4 pescando dall'arsenal
+  arsenal_base: "./arsenal"      # cartella arsenal (in Colab: /content/drive/MyDrive/...)
+  prefer_react_components: true  # preferisce le versioni React dei componenti
+  history_file: "roulette_history.json"
+  # nomi delle sottocartelle dell'arsenal (di default come nel tuo)
+  siti_dir: "SITI SCARICATI"
+  dna_dir: "DESIGN MD"
+  componenti_dir: "componenti"
+  animazioni_dir: "ANIMAZIONI"
+  font_dir: "FONT "
+  framer_subdir: "Framer_Interactions"
+  gsap_subdir: "gsap-public/esm"
