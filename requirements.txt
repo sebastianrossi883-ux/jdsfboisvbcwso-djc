@@ -1,6 +1,9 @@
 # Automazione del browser (consegna su sito Stitch)
 playwright==1.49.0
 
+# Splitter delle reference (taglio immagini in fette)
+Pillow==11.0.0
+
 # Configurazione
 PyYAML==6.0.2
 python-dotenv==1.0.1
