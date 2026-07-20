@@ -81,29 +81,36 @@ def main() -> None:
         if not st.get("browser_channel"):
             st["browser_channel"] = "chrome"
 
-    print("Apro Stitch con Chrome (browser visibile)...")
+    import time
+
+    print("Apro Stitch con Chrome (login gia' salvato)... nessun tasto da premere.")
     with StitchSender(cfg) as sender:
         sender.open()
-        input(
-            "\n>> Fai il login e vai alla schermata dove si SCRIVE il prompt "
-            "(con il menu del modello visibile).\n"
-            ">> Poi torna qui e premi INVIO per fotografare la pagina... "
-        )
-        # apre il menu del modello DAL PROGRAMMA (così non si richiude per il focus)
-        print("\nProvo ad aprire il menu del modello per catturarne le voci...")
+
+        # Aspetta che la pagina di Stitch sia caricata (compare il campo prompt).
+        print("Aspetto che Stitch carichi...")
+        ready = sender._find("prompt_input", timeout=60000)  # noqa: SLF001
+        if ready is None:
+            print("Non vedo ancora il campo del prompt. Se non sei loggato, "
+                  "fai il login nella finestra e rilancia il comando.")
+        time.sleep(3)  # lascia finire il rendering
+
+        # Apre il menu del modello da solo (così non si richiude per il focus).
+        print("Apro il menu del modello per catturarne le voci...")
         try:
-            import time
             if sender._click("model_menu_button", required=False):  # noqa: SLF001
                 time.sleep(1.5)
                 print("Menu del modello aperto.")
         except Exception as exc:  # noqa: BLE001
             print("Non sono riuscito ad aprire il menu del modello:", exc)
 
-        print("\nElementi trovati nella pagina di Stitch:")
+        print("\n================= ELEMENTI DI STITCH =================")
         _report(sender)
         sender.save_debug("calibrazione")
-    print("\nFatto. Ho salvato screenshot + DOM in ./debug/")
-    print("Copia-incolla l'elenco qui sopra (o mandami i file di debug).")
+        print("=====================================================")
+        # piccola pausa per lasciare a schermo il risultato
+        time.sleep(2)
+    print("\nFatto. Copia-incolla l'elenco qui sopra e mandamelo.")
 
 
 if __name__ == "__main__":
