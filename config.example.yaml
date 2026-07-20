@@ -63,17 +63,18 @@ stitch:
       - "button[type='submit']"
     model_menu_button:              # il pulsante col nome del modello (apre il menu)
       - "button:has-text('3 Flash')"
+      - "button:has-text('Thinking with 3.1 Pro')"
       - "button:has-text('3.1 Pro')"
       - "button:has-text('Flash')"
-      - "button:has-text('Gemini')"
-    model_option:                   # la voce "3.1 Pro" nel menu (da confermare)
-      - "text=3.1 Pro"
+    model_option:                   # la voce reale nel menu: "Thinking with 3.1 Pro"
+      - "text=Thinking with 3.1 Pro"
+      - "[role='menuitem']:has-text('Thinking with 3.1 Pro')"
       - "[role='option']:has-text('3.1 Pro')"
-      - "[role='menuitem']:has-text('3.1 Pro')"
+      - "text=3.1 Pro"
     model_current_label:            # etichetta del modello attivo (per il gate)
       - "button:has-text('3 Flash')"
+      - "button:has-text('Thinking with 3.1 Pro')"
       - "button:has-text('3.1 Pro')"
-      - "button:has-text('Flash')"
     generation_done:                # compare a fine generazione (da confermare)
       - "button:has-text('Download')"
       - "button:has-text('Scarica')"
