@@ -58,11 +58,11 @@ def main() -> None:
             print("ATTENZIONE:", exc)
             print("Provo comunque a inviare, ma potrebbe usare un altro modello.")
 
-        # 3) scrivi il prompt e invia
-        print("Scrivo il prompt e clicco 'Genera progetti'...")
+        # 3) scrivi il prompt e invia (pulsante o tasto Invio)
+        print("Scrivo il prompt e invio...")
         try:
             sender._fill("prompt_input", prompt)      # noqa: SLF001
-            sender._click("submit_button")            # noqa: SLF001
+            sender.submit()
             print("\n✅ PROMPT INVIATO! Guarda la finestra di Chrome: "
                   "Stitch dovrebbe iniziare a generare il sito.")
         except Exception as exc:  # noqa: BLE001

@@ -243,22 +243,25 @@ class StitchSender:
 
         Robusto anche se non conosco l'etichetta esatta: dopo aver aperto il
         menu, cerca una voce breve che contenga "Pro" (o il nome cercato) ed
-        escluda "progetti".
+        escluda "progetti". Se non trova, stampa le voci viste (per diagnosi).
         """
         if not self._click("model_menu_button", timeout=6000, required=False):
+            log.warning("Non sono riuscito ad aprire il menu del modello.")
             return
-        time.sleep(0.7)
+        time.sleep(0.9)
 
         # 1) prova i selettori configurati per l'opzione
         option_loc = self._find("model_option", timeout=3000)
         if option_loc is not None:
             option_loc.click()
+            log.info("Modello selezionato tramite selettore configurato.")
             return
 
-        # 2) fallback intelligente: cerca la voce "Pro" nel menu appena aperto
+        # 2) fallback: cerca la voce "Pro" nel menu appena aperto
         wanted = name.lower()
         key = "pro" if "pro" in wanted else wanted
         selectors = "[role='option'], [role='menuitem'], [role='menuitemradio'], li, button"
+        seen: list[str] = []
         for ctx in self._frames():
             try:
                 elements = ctx.query_selector_all(selectors)
@@ -266,19 +269,40 @@ class StitchSender:
                 continue
             for el in elements:
                 try:
-                    txt = (el.inner_text() or "").strip().lower()
+                    txt = (el.inner_text() or "").strip()
                 except Exception:
                     continue
-                if not txt or len(txt) > 30:
+                low = txt.lower()
+                if not txt or len(txt) > 30 or "progett" in low:
                     continue
-                if "progett" in txt:          # esclude "Genera/I miei progetti"
-                    continue
-                if key in txt or wanted in txt:
+                seen.append(txt)
+                if key in low or wanted in low:
                     try:
                         el.click()
+                        log.info("Modello selezionato dal menu: %r", txt)
                         return
                     except Exception:
                         continue
+
+        # niente da cliccare: stampa cosa c'era nel menu (diagnosi)
+        uniq = sorted(set(seen))
+        log.warning("Voce '%s' non trovata. Voci brevi viste nel menu: %s", name, uniq[:40])
+
+    # ---- invio (pulsante o tastiera) --------------------------------------
+
+    def submit(self) -> None:
+        """Invia il prompt: prova il pulsante, poi la tastiera (Invio)."""
+        loc = self._find("submit_button", timeout=3000)
+        if loc is not None:
+            loc.click()
+            log.info("Inviato col pulsante.")
+            return
+        inp = self._find("prompt_input", timeout=3000)
+        if inp is None:
+            raise RuntimeError("Ne' pulsante di invio ne' campo prompt trovati.")
+        inp.click()
+        self._page.keyboard.press("Enter")
+        log.info("Inviato con il tasto Invio (nessun pulsante trovato).")
 
     # ---- invio prompt ------------------------------------------------------
 
@@ -299,7 +323,7 @@ class StitchSender:
         if images:
             self.attach_references(images)
         self._fill("prompt_input", text)
-        self._click("submit_button")
+        self.submit()
         log.info("Prompt inviato (%d caratteri, %d immagini).", len(text), len(images or []))
         self._wait_generation_done()
 
