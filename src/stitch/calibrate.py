@@ -44,7 +44,8 @@ _COLLECT_JS = r"""
 """
 
 
-def _report(sender: StitchSender) -> None:
+def _report(sender: StitchSender, out_lines: list[str]) -> None:
+    """Stampa a schermo E accumula le righe in out_lines (per salvarle su file)."""
     seen = 0
     for i, ctx in enumerate(sender._frames()):  # noqa: SLF001 - script interno
         try:
@@ -53,17 +54,23 @@ def _report(sender: StitchSender) -> None:
             continue
         if not items:
             continue
-        print(f"\n=== FRAME {i} ({getattr(ctx, 'url', '')}) ===")
+        header = f"\n=== FRAME {i} ({getattr(ctx, 'url', '')}) ==="
+        print(header)
+        out_lines.append(header)
         for it in items:
             seen += 1
             attrs = " ".join(
                 f"{k}={it[k]!r}" for k in ("testid", "aria", "role", "type", "id", "ph")
                 if it[k]
             )
-            print(f"  [{it['kind']}] <{it['tag']}> text={it['text']!r}  {attrs}")
+            line = f"  [{it['kind']}] <{it['tag']}> text={it['text']!r}  {attrs}"
+            print(line)
+            out_lines.append(line)
     if not seen:
-        print("\n(nessun elemento riconosciuto: forse la pagina non è ancora caricata,"
-              " o il login non è completo)")
+        msg = ("\n(nessun elemento riconosciuto: forse la pagina non è ancora caricata,"
+               " o il login non è completo)")
+        print(msg)
+        out_lines.append(msg)
 
 
 def main() -> None:
@@ -105,12 +112,20 @@ def main() -> None:
             print("Non sono riuscito ad aprire il menu del modello:", exc)
 
         print("\n================= ELEMENTI DI STITCH =================")
-        _report(sender)
+        out_lines: list[str] = []
+        _report(sender, out_lines)
         sender.save_debug("calibrazione")
         print("=====================================================")
-        # piccola pausa per lasciare a schermo il risultato
+
+        # salva tutto in un file, così basta mandare quello
+        from pathlib import Path
+        out_file = Path("debug") / "elementi_stitch.txt"
+        out_file.parent.mkdir(parents=True, exist_ok=True)
+        out_file.write_text("\n".join(out_lines), encoding="utf-8")
+        print(f"\n>>> Ho salvato tutto nel file:  {out_file.resolve()}")
+        print(">>> MANDAMI QUEL FILE (trascinalo qui nella chat).")
         time.sleep(2)
-    print("\nFatto. Copia-incolla l'elenco qui sopra e mandamelo.")
+    print("\nFatto.")
 
 
 if __name__ == "__main__":
