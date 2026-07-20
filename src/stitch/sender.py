@@ -239,24 +239,46 @@ class StitchSender:
             return False
 
     def _select_model(self, name: str) -> None:
-        """Apre il menu del modello e seleziona `name`."""
+        """Apre il menu del modello e seleziona `name` (es. "3.1 Pro").
+
+        Robusto anche se non conosco l'etichetta esatta: dopo aver aperto il
+        menu, cerca una voce breve che contenga "Pro" (o il nome cercato) ed
+        escluda "progetti".
+        """
         if not self._click("model_menu_button", timeout=6000, required=False):
             return
-        time.sleep(0.5)
-        # l'opzione può essere parametrizzata col nome del modello
-        option_loc = self._find("model_option", timeout=4000)
-        if option_loc is None:
-            # prova a costruire un selettore testuale col nome del modello
-            for ctx in self._frames():
+        time.sleep(0.7)
+
+        # 1) prova i selettori configurati per l'opzione
+        option_loc = self._find("model_option", timeout=3000)
+        if option_loc is not None:
+            option_loc.click()
+            return
+
+        # 2) fallback intelligente: cerca la voce "Pro" nel menu appena aperto
+        wanted = name.lower()
+        key = "pro" if "pro" in wanted else wanted
+        selectors = "[role='option'], [role='menuitem'], [role='menuitemradio'], li, button"
+        for ctx in self._frames():
+            try:
+                elements = ctx.query_selector_all(selectors)
+            except Exception:
+                continue
+            for el in elements:
                 try:
-                    loc = ctx.get_by_text(name, exact=False).first
-                    if loc.count() > 0 and loc.is_visible():
-                        loc.click()
-                        return
+                    txt = (el.inner_text() or "").strip().lower()
                 except Exception:
                     continue
-            return
-        option_loc.click()
+                if not txt or len(txt) > 30:
+                    continue
+                if "progett" in txt:          # esclude "Genera/I miei progetti"
+                    continue
+                if key in txt or wanted in txt:
+                    try:
+                        el.click()
+                        return
+                    except Exception:
+                        continue
 
     # ---- invio prompt ------------------------------------------------------
 
