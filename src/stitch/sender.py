@@ -252,7 +252,16 @@ class StitchSender:
         if not self._click("model_menu_button", timeout=6000, required=False):
             log.warning("Non sono riuscito ad aprire il menu del modello.")
             return
-        time.sleep(0.9)
+        time.sleep(1.2)
+
+        # cattura una FOTO del menu (per capire se/come si apre) -> debug/menu_modello.png
+        try:
+            self.debug_dir.mkdir(parents=True, exist_ok=True)
+            shot = self.debug_dir / "menu_modello.png"
+            self._page.screenshot(path=str(shot), full_page=True)
+            log.info("Foto del menu modello salvata: %s", shot)
+        except Exception:  # noqa: BLE001
+            pass
 
         # 1) prova i selettori configurati per l'opzione
         option_loc = self._find("model_option", timeout=3000)
