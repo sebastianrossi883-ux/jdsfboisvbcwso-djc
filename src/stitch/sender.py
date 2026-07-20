@@ -50,6 +50,8 @@ class StitchSender:
         self.cfg = cfg
         self.url = cfg.get("stitch.url", "https://stitch.withgoogle.com/")
         self.model = cfg.get("stitch.model", "3.1 Pro")
+        # se True, blocca l'invio quando non riesce a tenere il modello; se False, prosegue
+        self.model_gate_strict = bool(cfg.get("stitch.model_gate_strict", True))
         self.version = str(cfg.get("stitch.version", "web")).lower()  # "web" oppure "app"
         self.headless = bool(cfg.get("stitch.headless", True))
         self.channel = cfg.get("stitch.browser_channel", None)  # es. "chrome"; None = Chromium
@@ -223,9 +225,11 @@ class StitchSender:
             log.info("OK: %s confermato dopo riselezione", target)
             return
         self.save_debug("pre_send_model_downgrade")
-        raise ModelDowngradeError(
-            f"STOP: non riesco a tenere {target} (quota finita?). Invio annullato di proposito."
-        )
+        if self.model_gate_strict:
+            raise ModelDowngradeError(
+                f"STOP: non riesco a tenere {target} (quota finita?). Invio annullato di proposito."
+            )
+        log.warning("Non riesco a impostare %s: proseguo col modello attuale.", target)
 
     def _model_is(self, name: str) -> bool:
         """Verifica se l'etichetta del modello attivo contiene `name`."""
