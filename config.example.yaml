@@ -44,38 +44,40 @@ stitch:
   # Ogni voce può essere una stringa O una lista di candidati: il sender prova
   # il primo che esiste (in pagina o dentro l'iframe di Stitch).
   selectors:
-    version_web_toggle:             # scheda/pulsante "Web" (NON "App")
-      - "button:has-text('Web')"
-      - "[role='tab']:has-text('Web')"
-      - "text=Web"
-    version_app_toggle:             # scheda/pulsante "App" (per riferimento)
-      - "button:has-text('App')"
-      - "[role='tab']:has-text('App')"
-    prompt_input:
+    # --- CALIBRATI sull'interfaccia reale di Stitch (2026-07) ---
+    version_web_toggle:             # pulsante radio "Web"
+      - "button[role='radio']:has-text('Web')"
+    version_app_toggle:             # pulsante radio "App"
+      - "button[role='radio']:has-text('App')"
+    prompt_input:                   # campo prompt = div contenteditable role=textbox
+      - "[role='textbox']"
       - "textarea"
       - "[contenteditable='true']"
-      - "[role='textbox']"
     image_upload_input:
       - "input[type='file']"
-    submit_button:
-      - "button[type='submit']"
-      - "button[aria-label*='Send' i]"
-      - "button:has-text('Send')"
-    model_menu_button:              # apre il menu di scelta modello
-      - "button:has-text('Pro')"
+    submit_button:                  # pulsante "Genera progetti"
+      - "button[aria-label='Genera progetti']"
+      - "button:has-text('Genera progetti')"
+      - "button[aria-label*='Generate' i]"
+    model_menu_button:              # il pulsante col nome del modello (apre il menu)
+      - "button:has-text('3 Flash')"
+      - "button:has-text('3.1 Pro')"
       - "button:has-text('Flash')"
-      - "[data-testid='model-selector']"
-    model_option:                   # la voce "3.1 Pro" nel menu
+      - "button:has-text('Gemini')"
+    model_option:                   # la voce "3.1 Pro" nel menu (da confermare)
       - "text=3.1 Pro"
       - "[role='option']:has-text('3.1 Pro')"
+      - "[role='menuitem']:has-text('3.1 Pro')"
     model_current_label:            # etichetta del modello attivo (per il gate)
-      - "[data-testid='model-selector']"
-      - "button:has-text('Pro')"
-    generation_done:                # elemento che compare a fine generazione
-      - "text=Download"
-      - "[data-testid='generation-complete']"
-    download_button:                # scarica lo ZIP del risultato
+      - "button:has-text('3 Flash')"
+      - "button:has-text('3.1 Pro')"
+      - "button:has-text('Flash')"
+    generation_done:                # compare a fine generazione (da confermare)
       - "button:has-text('Download')"
+      - "button:has-text('Scarica')"
+    download_button:                # scarica il risultato (da confermare)
+      - "button:has-text('Download')"
+      - "button:has-text('Scarica')"
       - "button[aria-label*='Download' i]"
 
 # -----------------------------------------------------------------------------
