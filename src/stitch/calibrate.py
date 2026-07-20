@@ -35,9 +35,9 @@ _COLLECT_JS = r"""
   };
   document.querySelectorAll('textarea, [contenteditable="true"], [role="textbox"]').forEach(e => push('INPUT', e));
   document.querySelectorAll('input[type=file]').forEach(e => push('UPLOAD', e));
-  document.querySelectorAll('button, [role="button"], [role="option"], [role="tab"], a').forEach(e => {
+  document.querySelectorAll('button, [role="button"], [role="option"], [role="tab"], [role="menuitem"], [role="menuitemradio"], a').forEach(e => {
     const t = (e.innerText || e.getAttribute('aria-label') || '').trim();
-    if (/pro|flash|web|app|send|invia|download|scarica|model|3\.1|export/i.test(t)) push('ACTION', e);
+    if (/pro|flash|web|app|send|invia|download|scarica|model|gemini|2\.5|3\.1|export/i.test(t)) push('ACTION', e);
   });
   return out;
 }
@@ -89,6 +89,16 @@ def main() -> None:
             "(con il menu del modello visibile).\n"
             ">> Poi torna qui e premi INVIO per fotografare la pagina... "
         )
+        # apre il menu del modello DAL PROGRAMMA (così non si richiude per il focus)
+        print("\nProvo ad aprire il menu del modello per catturarne le voci...")
+        try:
+            import time
+            if sender._click("model_menu_button", required=False):  # noqa: SLF001
+                time.sleep(1.5)
+                print("Menu del modello aperto.")
+        except Exception as exc:  # noqa: BLE001
+            print("Non sono riuscito ad aprire il menu del modello:", exc)
+
         print("\nElementi trovati nella pagina di Stitch:")
         _report(sender)
         sender.save_debug("calibrazione")
