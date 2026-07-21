@@ -90,6 +90,10 @@ python -m src.main --once      # elabora i job in coda una volta e esce
 
 Poi, per il funzionamento 24/7 su Oracle Cloud, segui **[deploy/oracle-setup.md](deploy/oracle-setup.md)**.
 
+Per riversare un export `.zip` in un repository Git collegato a Lovable
+(senza passare dalla chat), vedi **[docs/LOVABLE_GIT_SYNC.md](docs/LOVABLE_GIT_SYNC.md)**
+e lo script `scripts/lovable_git_sync.sh`.
+
 ---
 
 ## Configurazione
